@@ -16,7 +16,8 @@
         "codecvt": "c",
         "xlocale": "c",
         "__locale": "c",
-        "vector": "cpp"
+        "vector": "cpp",
+        "cstdlib": "cpp"
     },
     "cmake.configureOnOpen": false
 }

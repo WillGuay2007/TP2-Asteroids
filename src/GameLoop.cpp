@@ -1,7 +1,27 @@
 #include "entrypoint.h"
+#include "Classes.h"
 #include <raylib.h>
 
-//Creer votre class Engin ici et appeler une fonction start que vous définisser à la classe dans la fonction raylib_start plus bas.
+Game* game = nullptr;
+
 void raylib_start(void){
-    
+    InitWindow(WIDTH, HEIGHT, "ASTEROIDS");
+    SetTargetFPS(60);
+
+    game = new Game(3, 0);
+
+    game->Initialize();
+
+    while (!WindowShouldClose()) {
+        BeginDrawing();
+        ClearBackground(BLACK);
+        
+        game->Update();
+        game->Draw();
+        
+        EndDrawing();
+    }
+
+    delete game;
+    CloseWindow();
 }

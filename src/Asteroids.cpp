@@ -17,7 +17,7 @@ void Asteroid::Update(float dt)
 }
 
 bool Asteroid::isColliding(const GameObject& other) {
-    
+    return false;
 }
 
 int Asteroid::GetAsteroidSize() {

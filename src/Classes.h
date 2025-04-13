@@ -42,7 +42,11 @@ class Ship : public GameObject {
         bool Thrusting;
         
     public:
-        Ship(Vector2 startPosition, float _Speed, float _MaxSpeed, float _Acceleration) : GameObject(startPosition, {30, 30}), Speed(_Speed), MaxSpeed(_MaxSpeed), Acceleration(_Acceleration)   {};
+        Ship(Vector2 startPosition, float _Speed, float _MaxSpeed, float _Acceleration, bool _Thrusting = false) : GameObject(startPosition, {30, 30}), Speed(_Speed), MaxSpeed(_MaxSpeed), Acceleration(_Acceleration), Thrusting(_Thrusting) {
+            ShipTrianglePoints[0] = { startPosition.x, startPosition.y - 15 };
+            ShipTrianglePoints[1] = { startPosition.x - 15, startPosition.y + 15 };
+            ShipTrianglePoints[2] = { startPosition.x + 15, startPosition.y + 15 };
+        };
         
         void Draw() override;
         void Update(float dt) override;
@@ -122,7 +126,7 @@ class Game {
         std::vector<GameObject*> GameInstances;
         
     public:
-        Game(int _lives, int _level, GameState _currentState) : playerShip(nullptr), score(0), lives(_lives), level(_level), currentState(_currentState) {};
+        Game(int _lives, int _level) : playerShip(nullptr), score(0), lives(_lives), level(_level), currentState(MENU) {};
         ~Game() {
             if (playerShip != nullptr) {
                 delete playerShip;
