@@ -37,7 +37,6 @@ class GameObject {
         virtual ObjectType GetObjectType() = 0;
         virtual void Draw() = 0;
         virtual void Update(float dt) = 0;
-        virtual bool isColliding(const GameObject& objectType) = 0;
 };
 
 class Ship : public GameObject {
@@ -50,6 +49,8 @@ class Ship : public GameObject {
         float Acceleration;
         bool Thrusting;
         float radius = 15;
+        bool IsImmune = false;
+        float ImmunityTimer;
         
     public:
         Ship(Vector2 startPosition, float _Speed, float _MaxSpeed, float _Acceleration, bool _Thrusting = false) : GameObject(startPosition, {30, 30}), Speed(_Speed), MaxSpeed(_MaxSpeed), Acceleration(_Acceleration), Thrusting(_Thrusting) {};
@@ -57,12 +58,16 @@ class Ship : public GameObject {
         ObjectType GetObjectType() override;
         void Draw() override;
         void Update(float dt) override;
-        bool isColliding(const GameObject& other) override;
         
         void ApplyThrust(bool thrust);
         void RotateShip(float angle);
         void Shoot();
         void Hyperspace();
+        Vector2 GetPoint(int Index);
+        Vector2 LerpVelocityChange(Vector2 DesiredVelocityDirection, float t); // Ca va servir a ce que quand tu thrust dans une nouvelle direction, ca change pas instantanément
+        void MakeImmune(float _ImmuneTimer);
+        bool ShipIsImmune();
+        void VerifyImmuneTimer();
 };
 
 class Projectile : public GameObject {
@@ -78,7 +83,6 @@ class Projectile : public GameObject {
         ObjectType GetObjectType() override;
         void Draw() override;
         void Update(float dt) override;
-        bool isColliding(const GameObject& other) override;
         
         bool isExpired() const;
 };
@@ -93,17 +97,18 @@ class Asteroid : public GameObject {
         
     public:
         Asteroid(Vector2 position, int size, float _Speed) :GameObject(position), AsteroidSize(size), Speed(_Speed){
-            if (GetRandomValue(0,1) == 1) Direction.x = 1; else Direction.x = -1;
-            if (GetRandomValue(0,1) == 1) Direction.y = 1; else Direction.y = -1;
+            int DirectionAngle = GetRandomValue(0, 360);
+            Direction.x = cosf((DirectionAngle) * DEG2RAD);
+            Direction.y = sinf((DirectionAngle) * DEG2RAD);
         };
         
         ObjectType GetObjectType() override;
         void Draw() override;
         void Update(float dt) override;
-        bool isColliding(const GameObject& other) override;
         void SplitAsteroid();
         
         int GetAsteroidSize();
+        float GetAsteroidRadius();
         float GetSpeed();
 };
 
@@ -121,7 +126,6 @@ class Soucoupe : public GameObject {
         ObjectType GetObjectType() override;
         void Draw() override;
         void Update(float dt) override;
-        bool isColliding(const GameObject& other) override;
         
         void Shoot(Vector2 targetPosition);
         bool IsSmall() const { return isSmall; }
@@ -135,6 +139,8 @@ class Game {
         int score;
         int lives;
         int level;
+
+        Texture2D BackgroundTexture = LoadTextureFromImage(LoadImage("Background.png"));
         
         Ship* playerShip;
         std::vector<GameObject*> GameInstances;
@@ -159,8 +165,14 @@ class Game {
         void SpawnSoucoupe();
 
         void AddGameObject(GameObject* obj);
+        void RemoveGameObject(GameObject* obj);
         
         void HandleMenuInput();
         void HandlePlayingInput();
         void HandleGameOverInput();
+
+        void HandleShipCollisions();
+        void HandleProjectileCollisions();
+        void HandleAsteroidCollisions();
+        void HandleSoucoupeCollisions();
     };

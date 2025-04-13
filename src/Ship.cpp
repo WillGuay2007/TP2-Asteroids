@@ -23,7 +23,7 @@ void Ship::Draw()
         ShipTrianglePoints[0], 
         ShipTrianglePoints[1],
         ShipTrianglePoints[2], 
-    WHITE);
+    IsImmune ? BLUE : GRAY); // Si le joueur est temporairement invincible, il sera bleu. Sinon, gris.
 
     //Juste pour que le joueur sache ou est le devant
     DrawCircleV(ShipTrianglePoints[0], 2, RED);
@@ -31,6 +31,40 @@ void Ship::Draw()
 }
 
 void Ship::Update(float dt) {
+
+    VerifyImmuneTimer();
+
+    // Si il sort de l'écran
+    if (Position.x - radius > WIDTH) {
+        Position.x = 0 - radius;
+    }
+    else if (Position.x + radius < 0) {
+        Position.x = WIDTH + radius;
+    }
+
+    if (Position.y - radius > HEIGHT) {
+        Position.y = 0 - radius;
+    }
+    else if (Position.y + radius < 0) {
+        Position.y = HEIGHT + radius;
+    }
+
+
+    if (Thrusting) {
+        Vector2 DesiredVelocityDirection = {
+            cosf((270.0f + Rotation) * DEG2RAD),
+            sinf((270.0f + Rotation) * DEG2RAD)
+        };
+    
+        Velocity = LerpVelocityChange(DesiredVelocityDirection, 0.02f); // Ca ajoute de la friction au vaisseau comme ca il change pas de direction d'un coup
+    
+        Speed += Acceleration * dt;
+        if (Speed > MaxSpeed) Speed = MaxSpeed;
+    } else {} // Pour plus tard
+    Position.x += Velocity.x * Speed * dt;
+    Position.y += Velocity.y * Speed * dt;
+
+
     if (IsKeyDown(KEY_A)) {
         Rotate(-180 * dt);
     }
@@ -40,14 +74,42 @@ void Ship::Update(float dt) {
     if (IsKeyPressed(KEY_SPACE)) {
         //playerShip->Shoot();
     }
-    if (IsKeyPressed(KEY_S)) {
-        //Ralentir
+    if (IsKeyDown(KEY_S)) {
+        Speed -= (Acceleration * dt / 2);
+        if (Speed < 0) Speed = 0;
     }
-    if (IsKeyPressed(KEY_W)) {
-        //Thrust
+    if (IsKeyDown(KEY_W)) {
+        Thrusting = true;
+    } else {
+        Thrusting = false;
     }
 }
 
-bool Ship::isColliding(const GameObject& other) {
-    return false;
+Vector2 Ship::LerpVelocityChange(Vector2 DesiredVelocityDirection, float t) {
+    return {
+        Velocity.x + (DesiredVelocityDirection.x - Velocity.x) * t,
+        Velocity.y + (DesiredVelocityDirection.y - Velocity.y) * t
+    };
+}
+
+Vector2 Ship::GetPoint(int Index) {
+    return ShipTrianglePoints[Index];
+}
+
+void Ship::MakeImmune(float _ImmuneTimer) {
+    ImmunityTimer = _ImmuneTimer;
+    IsImmune = true;
+}
+
+bool Ship::ShipIsImmune() {
+    return IsImmune;
+}
+
+void Ship::VerifyImmuneTimer() {
+    if (IsImmune && ImmunityTimer <= 0) {
+        IsImmune = false;
+        ImmunityTimer = 0;
+    } else if (IsImmune) {
+        ImmunityTimer -= GetFrameTime();
+    }
 }

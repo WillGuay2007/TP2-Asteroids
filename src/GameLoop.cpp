@@ -5,6 +5,7 @@
 Game* game = nullptr;
 
 void raylib_start(void){
+
     InitWindow(WIDTH, HEIGHT, "ASTEROIDS");
     SetTargetFPS(60);
 

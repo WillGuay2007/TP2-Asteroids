@@ -4,6 +4,18 @@ void Game::AddGameObject(GameObject* obj) {
     GameInstances.push_back(obj);
 }
 
+void Game::RemoveGameObject(GameObject* obj) {
+    for (int i = 0; i < GameInstances.size(); i++) {
+        if (GameInstances[i] == obj) {
+            GameInstances.erase(GameInstances.begin() + i);
+            
+            delete obj;
+            
+            break;
+        }
+    }
+}
+
 void Game::SpawnAsteroids(int count) {
     for (int i = 0; i < count; i++) {
         Vector2 a_Position;
@@ -53,10 +65,10 @@ void Game::Update() {
     
     else if (currentState == PLAYING) {
         HandlePlayingInput();
-        playerShip->Update(GetFrameTime());
         for (int i = 0; i < GameInstances.size(); i++) {
             GameInstances[i]->Update(GetFrameTime());
         }
+        HandleShipCollisions();
     } 
    
     else if (currentState == GAME_OVER) {
@@ -65,16 +77,70 @@ void Game::Update() {
 }
 
 void Game::Draw() {
+
+    DrawTexture(
+        BackgroundTexture, 
+        0,
+        0,
+        WHITE
+    );
+
     if (currentState == MENU) {
         //Dessiner le menu (Je vais le faire plus tard)
     } 
     else if (currentState == PLAYING) {
-        playerShip->Draw();
         for (int i = 0; i < GameInstances.size(); i++) {
             GameInstances[i]->Draw();
         }
+        playerShip->Draw();
     }
     else if (currentState == GAME_OVER) {
         //Dessiner le game over (Je vais le faire plus tard)
     }
+}
+
+void Game::HandleShipCollisions() {
+
+    if (playerShip->ShipIsImmune()) return;
+
+    Vector2 Points[3];
+    Points[0] = playerShip->GetPoint(0);
+    Points[1] = playerShip->GetPoint(1);
+    Points[2] = playerShip->GetPoint(2);
+
+    for (int i = 0; i < GameInstances.size(); i++) {
+        if (GameInstances[i]->GetObjectType() == ASTEROID) {
+            Asteroid* currentAsteroid = dynamic_cast<Asteroid*>(GameInstances[i]);
+            
+            if (currentAsteroid != nullptr) {
+                float asteroidRadius = currentAsteroid->GetAsteroidRadius();
+                Vector2 asteroidCenter = currentAsteroid->GetPosition();
+
+                for (int pointIndex = 0; pointIndex < 3; pointIndex++) {
+                    float distance = sqrt(
+                        pow(Points[pointIndex].x - asteroidCenter.x, 2) +
+                        pow(Points[pointIndex].y - asteroidCenter.y, 2)
+                    );
+
+                    if (distance < asteroidRadius * currentAsteroid->GetAsteroidSize()) {
+                        playerShip->MakeImmune(3);
+                        currentAsteroid->SplitAsteroid();
+                        break;
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+
+void Game::HandleProjectileCollisions() {
+
+}
+void Game::HandleAsteroidCollisions() {
+
+}
+void Game::HandleSoucoupeCollisions() {
+
 }

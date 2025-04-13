@@ -12,7 +12,3 @@ void Projectile::Draw() {
 void Projectile::Update(float dt) {
 
 }
-
-bool Projectile::isColliding(const GameObject& other) {
-    
-}

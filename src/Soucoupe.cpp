@@ -12,7 +12,3 @@ void Soucoupe::Draw() {
 void Soucoupe::Update(float dt) {
 
 }
-
-bool Soucoupe::isColliding(const GameObject& other) {
-    
-}
