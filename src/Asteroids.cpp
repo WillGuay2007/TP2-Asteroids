@@ -2,18 +2,28 @@
 
 void Asteroid::Draw()
 {
-    DrawCircle(Position.x, Position.y, GetAsteroidSize() * 50, WHITE);
+    DrawCircle(Position.x, Position.y, AsteroidSize * AsteroidRadius, WHITE);
 }
 
 void Asteroid::Update(float dt)
 {
+    // Move the asteroid
     Position.x += Direction.x * Speed * dt;
     Position.y += Direction.y * Speed * dt;
 
-    if (Position.x + (AsteroidSize * 50) > WIDTH) Position.x = (AsteroidSize * 50);
-    if (Position.x - (AsteroidSize * 50) < 0) Position.x = WIDTH - (AsteroidSize * 50);
-    if (Position.y + (AsteroidSize * 50) > HEIGHT) Position.y = (AsteroidSize * 50);
-    if (Position.y - (AsteroidSize * 50) < 0) Position.y = HEIGHT - (AsteroidSize * 50);
+    if (Position.x - (AsteroidSize * AsteroidRadius) > WIDTH) {
+        Position.x = 0 - (AsteroidSize * AsteroidRadius) + 1;
+    }
+    else if (Position.x + (AsteroidSize * AsteroidRadius) < 0) {
+        Position.x = WIDTH + (AsteroidSize * AsteroidRadius) - 1;
+    }
+
+    if (Position.y - (AsteroidSize * AsteroidRadius) > HEIGHT) {
+        Position.y = 0 - (AsteroidSize * AsteroidRadius) + 1;
+    }
+    else if (Position.y + (AsteroidSize * AsteroidRadius) < 0) {
+        Position.y = HEIGHT + (AsteroidSize * AsteroidRadius) - 1;
+    }
 }
 
 bool Asteroid::isColliding(const GameObject& other) {

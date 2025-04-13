@@ -10,7 +10,7 @@ void raylib_start(void){
 
     game = new Game(3, 0);
 
-    game->Initialize();
+    game->Initialize(); //Initialiser le ship, spawner les asteroids et mettre la game state a playing.
 
     while (!WindowShouldClose()) {
         BeginDrawing();

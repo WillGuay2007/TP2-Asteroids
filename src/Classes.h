@@ -78,6 +78,7 @@ class Asteroid : public GameObject {
     private:
         float Speed;
         Vector2 Direction;
+        float AsteroidRadius = 25;
         int AsteroidSize;  // 3 est grand, 2 est moyen, 1 est petit
         
     public:

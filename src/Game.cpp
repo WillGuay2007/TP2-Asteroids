@@ -42,13 +42,13 @@ void Game::Initialize()
 
 void Game::HandlePlayingInput() {
     if (IsKeyPressed(KEY_A)) {
-        playerShip->Rotate(15);
+        //playerShip->Rotate(15);
     }
     if (IsKeyPressed(KEY_D)) {
-        playerShip->Rotate(-15);
+        //playerShip->Rotate(-15);
     }
     if (IsKeyPressed(KEY_SPACE)) {
-        playerShip->Shoot();
+        //playerShip->Shoot();
     }
     if (IsKeyPressed(KEY_S)) {
         //Ralentir
@@ -60,8 +60,7 @@ void Game::HandlePlayingInput() {
 
 void Game::Update() {
     if (currentState == MENU) {
-        HandleMenuInput();
-
+        //HandleMenuInput();
     } 
     
     else if (currentState == PLAYING) {
@@ -73,7 +72,7 @@ void Game::Update() {
     } 
    
     else if (currentState == GAME_OVER) {
-        HandleGameOverInput();
+        //HandleGameOverInput();
     }
 }
 
