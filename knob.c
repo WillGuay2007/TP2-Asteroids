@@ -95,6 +95,8 @@ bool build_game(void)
     knob_cmd_append(&cmd, "./src/GameObject.cpp");
     knob_cmd_append(&cmd, "./src/Ship.cpp"); 
     knob_cmd_append(&cmd, "./src/Asteroids.cpp");
+    knob_cmd_append(&cmd, "./src/Soucoupe.cpp");
+    knob_cmd_append(&cmd, "./src/Projectile.cpp");
     knob_cmd_append(&cmd, "-lkernel32","-lwinmm", "-lgdi32","-lopengl32");
     knob_cmd_append(&cmd,"./src/main.cpp");
     knob_cmd_append(&cmd, "-o", "./Deployment/game.exe");

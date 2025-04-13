@@ -1,5 +1,10 @@
 #include "Classes.h"
 
+ObjectType Asteroid::GetObjectType()
+{
+    return objType;
+}
+
 void Asteroid::Draw()
 {
     DrawCircle(Position.x, Position.y, AsteroidSize * AsteroidRadius, WHITE);

@@ -41,20 +41,8 @@ void Game::Initialize()
 }
 
 void Game::HandlePlayingInput() {
-    if (IsKeyPressed(KEY_A)) {
-        //playerShip->Rotate(15);
-    }
-    if (IsKeyPressed(KEY_D)) {
-        //playerShip->Rotate(-15);
-    }
-    if (IsKeyPressed(KEY_SPACE)) {
-        //playerShip->Shoot();
-    }
-    if (IsKeyPressed(KEY_S)) {
-        //Ralentir
-    }
-    if (IsKeyPressed(KEY_W)) {
-        //Thrust
+    if (playerShip != nullptr) {
+        playerShip->Update(GetFrameTime());
     }
 }
 

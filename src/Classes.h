@@ -6,6 +6,13 @@
 #define WIDTH 500
 #define HEIGHT 500
 
+enum ObjectType {
+    SHIP,
+    ASTEROID,
+    PROJECTILE,
+    SOUCOUPE
+};
+
 class GameObject {
     protected:
         Vector2 Position;
@@ -27,6 +34,7 @@ class GameObject {
         void SetRotation(float Rotation);
         void SetSize(Vector2 Size);
         
+        virtual ObjectType GetObjectType() = 0;
         virtual void Draw() = 0;
         virtual void Update(float dt) = 0;
         virtual bool isColliding(const GameObject& objectType) = 0;
@@ -34,20 +42,19 @@ class GameObject {
 
 class Ship : public GameObject {
     private:
+        ObjectType objType = SHIP;
         Vector2 ShipTrianglePoints[3];
         Vector2 Velocity;
         float Speed;
         float MaxSpeed;
         float Acceleration;
         bool Thrusting;
+        float radius = 15;
         
     public:
-        Ship(Vector2 startPosition, float _Speed, float _MaxSpeed, float _Acceleration, bool _Thrusting = false) : GameObject(startPosition, {30, 30}), Speed(_Speed), MaxSpeed(_MaxSpeed), Acceleration(_Acceleration), Thrusting(_Thrusting) {
-            ShipTrianglePoints[0] = { startPosition.x, startPosition.y - 15 };
-            ShipTrianglePoints[1] = { startPosition.x - 15, startPosition.y + 15 };
-            ShipTrianglePoints[2] = { startPosition.x + 15, startPosition.y + 15 };
-        };
+        Ship(Vector2 startPosition, float _Speed, float _MaxSpeed, float _Acceleration, bool _Thrusting = false) : GameObject(startPosition, {30, 30}), Speed(_Speed), MaxSpeed(_MaxSpeed), Acceleration(_Acceleration), Thrusting(_Thrusting) {};
         
+        ObjectType GetObjectType() override;
         void Draw() override;
         void Update(float dt) override;
         bool isColliding(const GameObject& other) override;
@@ -60,6 +67,7 @@ class Ship : public GameObject {
 
 class Projectile : public GameObject {
     private:
+        ObjectType objType = PROJECTILE;
         Vector2 Velocity;
         float LifeTime;
         float MaxLifeTime;
@@ -67,6 +75,7 @@ class Projectile : public GameObject {
     public:
         Projectile(Vector2 position, Vector2 velocity, float maxLifeTime = 2.0f) : GameObject(position), Velocity(velocity), MaxLifeTime(maxLifeTime) {};
         
+        ObjectType GetObjectType() override;
         void Draw() override;
         void Update(float dt) override;
         bool isColliding(const GameObject& other) override;
@@ -76,6 +85,7 @@ class Projectile : public GameObject {
 
 class Asteroid : public GameObject {
     private:
+        ObjectType objType = ASTEROID;
         float Speed;
         Vector2 Direction;
         float AsteroidRadius = 25;
@@ -87,6 +97,7 @@ class Asteroid : public GameObject {
             if (GetRandomValue(0,1) == 1) Direction.y = 1; else Direction.y = -1;
         };
         
+        ObjectType GetObjectType() override;
         void Draw() override;
         void Update(float dt) override;
         bool isColliding(const GameObject& other) override;
@@ -98,6 +109,7 @@ class Asteroid : public GameObject {
 
 class Soucoupe : public GameObject {
     private:
+        ObjectType objType = SOUCOUPE;
         Vector2 Velocity;
         bool isSmall;
         float ShootTimer;
@@ -106,6 +118,7 @@ class Soucoupe : public GameObject {
     public:
         Soucoupe(Vector2 position, bool small);
         
+        ObjectType GetObjectType() override;
         void Draw() override;
         void Update(float dt) override;
         bool isColliding(const GameObject& other) override;
