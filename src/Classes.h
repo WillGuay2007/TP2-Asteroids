@@ -55,7 +55,8 @@ class Ship : public GameObject {
         
     public:
         Ship(Vector2 startPosition, float _Speed, float _MaxSpeed, float _Acceleration, bool _Thrusting = false) : GameObject(startPosition, {30, 30}), Speed(_Speed), MaxSpeed(_MaxSpeed), Acceleration(_Acceleration), Thrusting(_Thrusting) {SetSoundVolume(ShootSound, 0.1f);};
-        
+        ~Ship() {}
+
         ObjectType GetObjectType() override;
         void Draw() override;
         void Update(float dt) override;
@@ -83,7 +84,8 @@ class Projectile : public GameObject {
         
     public:
         Projectile(Vector2 position, Vector2 velocity, float maxLifeTime = 2.0f, float _Speed = 50) : GameObject(position), Velocity(velocity), MaxLifeTime(maxLifeTime), Speed(_Speed) {};
-        
+        ~Projectile(){};
+
         ObjectType GetObjectType() override;
         void Draw() override;
         void Update(float dt) override;
@@ -94,7 +96,7 @@ class Projectile : public GameObject {
 
 class Asteroid : public GameObject {
     private:
-        Sound ExplodeSound = LoadSound("Asteroid_Explode.wav");
+        Sound ExplodeSound = LoadSound("Asteroid_Explode.mp3");
         ObjectType objType = ASTEROID;
         float Speed;
         Vector2 Direction;
@@ -108,6 +110,7 @@ class Asteroid : public GameObject {
             Direction.y = sinf((DirectionAngle) * DEG2RAD);
             SetSoundVolume(ExplodeSound, 0.1f);
         };
+        ~Asteroid() {};
         
         ObjectType GetObjectType() override;
         void Draw() override;
@@ -126,9 +129,29 @@ class Soucoupe : public GameObject {
         bool isSmall;
         float ShootTimer;
         float DirectionTimer;
+        Texture2D SoucoupeTexture;
         
     public:
-        Soucoupe(Vector2 position, bool small);
+        Soucoupe(Vector2 position, bool small = true) :GameObject(position), isSmall(small) {
+            if (isSmall) {
+                SoucoupeTexture = LoadTexture("small_ufo.png");
+                SetSize({40, 30});
+            }
+            else {
+                SoucoupeTexture = LoadTexture("large_ufo.png");
+                SetSize({70, 50});
+            }
+        
+            ShootTimer = 0;
+            DirectionTimer = 0;
+        
+            float angle = GetRandomValue(0, 360) * DEG2RAD;
+            float speed = isSmall ? 150.0f : 100.0f;// Les petites sont plus rapides
+
+            Velocity.x = cosf(angle) * speed;
+            Velocity.y = sinf(angle) * speed;
+        };
+        ~Soucoupe() {UnloadTexture(SoucoupeTexture);};
         
         ObjectType GetObjectType() override;
         void Draw() override;
@@ -146,6 +169,7 @@ class Game {
         int score;
         int lives;
         int level;
+        int GainLifeCheckpoint = 10000;
 
         Texture2D BackgroundTexture = LoadTextureFromImage(LoadImage("Background.png"));
         
@@ -161,6 +185,7 @@ class Game {
             }
         };
         
+        void CheckGainLife();
         void Initialize();
         void StartNewLevel();
         bool CheckIfLevelIsFinished();
@@ -170,7 +195,7 @@ class Game {
         void GameOver();
         void CheckCollisions();
         void SpawnAsteroids(int count);
-        void SpawnSoucoupe();
+        void SpawnSoucoupe(int count);
 
         void DrawScore();
         void DrawLives();

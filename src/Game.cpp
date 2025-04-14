@@ -90,6 +90,7 @@ void Game::Update() {
             level++;
             StartNewLevel();
         };
+        CheckGainLife();
         HandlePlayingInput();
         for (int i = 0; i < GameInstances.size(); i++) {
             GameInstances[i]->Update(GetFrameTime());
@@ -194,7 +195,7 @@ void Game::HandleProjectileCollisions() {
                 
                 if (distance < (projectileRadius + asteroidRadius)) {
                     if (currentAsteroid->GetAsteroidSize() != 0) { // C'est pour prevent un bug
-                        score += 75 / currentAsteroid->GetAsteroidSize();
+                        score += 250 / currentAsteroid->GetAsteroidSize(); // Je sais, 250 est un peu élevé mais c'est pour que le testing se fasse plus rapidement
                     }
                     currentAsteroid->SplitAsteroid();
                     RemoveGameObject(currentProjectile);
@@ -256,6 +257,7 @@ void Game::StartNewLevel() {
     
     int asteroidCount = 2 + level;
     SpawnAsteroids(asteroidCount);
+    SpawnSoucoupe(2);
     
     playerShip->MakeImmune(2.0f);
     
@@ -270,6 +272,45 @@ bool Game::CheckIfLevelIsFinished() {
         }
     }
     return true; // Si aucun asteroid n'a été trouvé dans le vector
+}
+
+void Game::SpawnSoucoupe(int count) {
+    for (int i = 0; i < count; i++) {
+        bool isSmall = (GetRandomValue(0, 1000) < (score / 100 + 100)) || (score > 40000); // Plus que le score est haut plus qu'il va yavoir de petites
+        
+        Vector2 spawnPosition;
+        
+        int side = GetRandomValue(0, 3); //Ca choisi un axe de l'écran pour la position
+        
+        switch (side) {
+            case 0:
+                spawnPosition.x = GetRandomValue(0, WIDTH - 100);
+                spawnPosition.y = 0;
+                break;
+            case 1:
+                spawnPosition.x = WIDTH - 100;
+                spawnPosition.y = GetRandomValue(0, HEIGHT - 100);
+                break;
+            case 2:
+                spawnPosition.x = GetRandomValue(0, WIDTH - 100);
+                spawnPosition.y = HEIGHT - 100;
+                break;
+            case 3:
+                spawnPosition.x = 0;
+                spawnPosition.y = GetRandomValue(0, HEIGHT - 100);
+                break;
+        }
+
+        Soucoupe* newSoucoupe = new Soucoupe(spawnPosition, isSmall);
+        AddGameObject(newSoucoupe);
+    }
+}
+
+void Game::CheckGainLife() {
+    if (score > GainLifeCheckpoint) {
+        GainLifeCheckpoint += 10000;
+        lives++;
+    }
 }
 
 //Bananita dolphinita
