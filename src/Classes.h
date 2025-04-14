@@ -41,6 +41,7 @@ class GameObject {
 
 class Ship : public GameObject {
     private:
+        Sound ShootSound = LoadSound("Laser_Shoot.mp3");
         ObjectType objType = SHIP;
         Vector2 ShipTrianglePoints[3];
         Vector2 Velocity;
@@ -53,7 +54,7 @@ class Ship : public GameObject {
         float ImmunityTimer;
         
     public:
-        Ship(Vector2 startPosition, float _Speed, float _MaxSpeed, float _Acceleration, bool _Thrusting = false) : GameObject(startPosition, {30, 30}), Speed(_Speed), MaxSpeed(_MaxSpeed), Acceleration(_Acceleration), Thrusting(_Thrusting) {};
+        Ship(Vector2 startPosition, float _Speed, float _MaxSpeed, float _Acceleration, bool _Thrusting = false) : GameObject(startPosition, {30, 30}), Speed(_Speed), MaxSpeed(_MaxSpeed), Acceleration(_Acceleration), Thrusting(_Thrusting) {SetSoundVolume(ShootSound, 0.1f);};
         
         ObjectType GetObjectType() override;
         void Draw() override;
@@ -65,6 +66,7 @@ class Ship : public GameObject {
         void Hyperspace();
         Vector2 GetPoint(int Index);
         Vector2 LerpVelocityChange(Vector2 DesiredVelocityDirection, float t); // Ca va servir a ce que quand tu thrust dans une nouvelle direction, ca change pas instantanément
+        Vector2 GetDirectionUnit();
         void MakeImmune(float _ImmuneTimer);
         bool ShipIsImmune();
         void VerifyImmuneTimer();
@@ -74,25 +76,29 @@ class Projectile : public GameObject {
     private:
         ObjectType objType = PROJECTILE;
         Vector2 Velocity;
-        float LifeTime;
+        float LifeTime = 0;
         float MaxLifeTime;
+        float Radius = 2;
+        float Speed;
         
     public:
-        Projectile(Vector2 position, Vector2 velocity, float maxLifeTime = 2.0f) : GameObject(position), Velocity(velocity), MaxLifeTime(maxLifeTime) {};
+        Projectile(Vector2 position, Vector2 velocity, float maxLifeTime = 2.0f, float _Speed = 50) : GameObject(position), Velocity(velocity), MaxLifeTime(maxLifeTime), Speed(_Speed) {};
         
         ObjectType GetObjectType() override;
         void Draw() override;
         void Update(float dt) override;
         
         bool isExpired() const;
+        float GetRadius();
 };
 
 class Asteroid : public GameObject {
     private:
+        Sound ExplodeSound = LoadSound("Asteroid_Explode.wav");
         ObjectType objType = ASTEROID;
         float Speed;
         Vector2 Direction;
-        float AsteroidRadius = 25;
+        float AsteroidRadius = 10;
         int AsteroidSize;  // 3 est grand, 2 est moyen, 1 est petit
         
     public:
@@ -100,6 +106,7 @@ class Asteroid : public GameObject {
             int DirectionAngle = GetRandomValue(0, 360);
             Direction.x = cosf((DirectionAngle) * DEG2RAD);
             Direction.y = sinf((DirectionAngle) * DEG2RAD);
+            SetSoundVolume(ExplodeSound, 0.1f);
         };
         
         ObjectType GetObjectType() override;
@@ -155,14 +162,21 @@ class Game {
         };
         
         void Initialize();
+        void StartNewLevel();
+        bool CheckIfLevelIsFinished();
         void Update();
         void Draw();
         
-        void StartNewGame();
         void GameOver();
         void CheckCollisions();
         void SpawnAsteroids(int count);
         void SpawnSoucoupe();
+
+        void DrawScore();
+        void DrawLives();
+        void DrawMenu();
+
+        void LoseLife();
 
         void AddGameObject(GameObject* obj);
         void RemoveGameObject(GameObject* obj);
@@ -173,6 +187,5 @@ class Game {
 
         void HandleShipCollisions();
         void HandleProjectileCollisions();
-        void HandleAsteroidCollisions();
         void HandleSoucoupeCollisions();
     };

@@ -51,28 +51,28 @@ void Ship::Update(float dt) {
 
 
     if (Thrusting) {
-        Vector2 DesiredVelocityDirection = {
-            cosf((270.0f + Rotation) * DEG2RAD),
-            sinf((270.0f + Rotation) * DEG2RAD)
-        };
-    
-        Velocity = LerpVelocityChange(DesiredVelocityDirection, 0.02f); // Ca ajoute de la friction au vaisseau comme ca il change pas de direction d'un coup
+ 
+        Velocity = LerpVelocityChange(GetDirectionUnit(), 0.1f); // Ca ajoute de la friction au vaisseau comme ca il change pas de direction d'un coup
     
         Speed += Acceleration * dt;
         if (Speed > MaxSpeed) Speed = MaxSpeed;
-    } else {} // Pour plus tard
+    } else {
+        Speed *= 0.99;
+    } // Pour plus tard
     Position.x += Velocity.x * Speed * dt;
     Position.y += Velocity.y * Speed * dt;
 
 
     if (IsKeyDown(KEY_A)) {
-        Rotate(-180 * dt);
+        Rotate(-270 * dt);
     }
     if (IsKeyDown(KEY_D)) {
-        Rotate(180 * dt);
+        Rotate(270 * dt);
     }
     if (IsKeyPressed(KEY_SPACE)) {
-        //playerShip->Shoot();
+        if (!IsImmune) {
+            Shoot();
+        }
     }
     if (IsKeyDown(KEY_S)) {
         Speed -= (Acceleration * dt / 2);
@@ -112,4 +112,26 @@ void Ship::VerifyImmuneTimer() {
     } else if (IsImmune) {
         ImmunityTimer -= GetFrameTime();
     }
+}
+
+Vector2 Ship::GetDirectionUnit() {
+    return Vector2 {
+        cosf((270.0f + Rotation) * DEG2RAD),
+        sinf((270.0f + Rotation) * DEG2RAD)
+    };
+}
+
+void Ship::Shoot() {
+    extern Game* game;
+    PlaySound(ShootSound);
+    Vector2 ProjectilePosition = {
+        ShipTrianglePoints[0].x,
+        ShipTrianglePoints[0].y
+    };
+    Vector2 ProjectileVelocity = {
+        GetDirectionUnit().x,
+        GetDirectionUnit().y
+    };
+    Projectile* newProjectile = new Projectile(ProjectilePosition, ProjectileVelocity, 3, 250);
+    game->AddGameObject(newProjectile);
 }

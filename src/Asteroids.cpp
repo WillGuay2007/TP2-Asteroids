@@ -45,7 +45,8 @@ float Asteroid::GetAsteroidRadius() {
 
 void Asteroid::SplitAsteroid() {
     extern Game* game;
-    if (AsteroidSize - 1 == 0) {game->RemoveGameObject(this);};
+    PlaySound(ExplodeSound);
+    if (AsteroidSize - 1 == 0) {game->RemoveGameObject(this); return;};
     int NumberOfChilds = GetRandomValue(2, 3);
     for (int i = 0; i < NumberOfChilds; i++) {
         int RandomDirection = GetRandomValue(0, 360);
